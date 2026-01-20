@@ -1,8 +1,8 @@
-name: Deploy Flutter Web to GitHub Pages
+name: Deploy Flutter Web
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -15,40 +15,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
 
-      - name: Install dependencies
+      - name: Install deps
         run: flutter pub get
 
       - name: Build web
-        # IMPORTANT: set base-href to your repo name (GitHub Pages project site)
-        # Example: /elian-portfolio/
-        run: flutter build web --release --base-href "${{ vars.BASE_HREF || '/' }}"
+        run: flutter build web --release --web-renderer html --base-href "/Elian-Portfolio-/"
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: build/web
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - name: Deploy
         uses: actions/deploy-pages@v4
