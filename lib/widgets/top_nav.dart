@@ -35,7 +35,11 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
                 colors: [theme.colorScheme.primary, theme.colorScheme.tertiary],
               ),
             ),
-            child: const Icon(Icons.auto_awesome, size: 18),
+                 child: Image.asset(
+                  'assets/icons/elian.png',
+                  width: 18,
+                  height: 18,
+                ),
           ),
           const SizedBox(width: 12),
           Text(
