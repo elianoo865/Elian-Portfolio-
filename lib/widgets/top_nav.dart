@@ -29,10 +29,6 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
           Container(
             width: 34,
             height: 34,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [theme.colorScheme.primary, theme.colorScheme.tertiary],
-              ),
             ),
                  child: Image.asset(
                   'assets/icons/elian.png',
