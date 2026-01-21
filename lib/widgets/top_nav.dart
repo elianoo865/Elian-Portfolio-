@@ -24,40 +24,44 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: theme.colorScheme.surface.withOpacity(0.72),
       scrolledUnderElevation: 0,
       centerTitle: false,
-      title: Row(
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(13,
-              gradient: LinearGradient(
-                colors: [theme.colorScheme.primary, theme.colorScheme.tertiary],
+      title: Padding(
+        padding: const EdgeInsets.only(
+          left: 25, // space from left
+          top: 25,// space from top
+          bottom: 25,//eeps vertical balance
+        ),
+        child: Row(
+          children: [
+            Image.asset(
+              'assets/icons/elian.png',
+              width: 34,
+              height: 34,
+              fit: BoxFit.contain,
+            ),
+
+            const SizedBox(width: 12),
+
+            Text(
+              'Elian Al-Kadar',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
               ),
             ),
-                 child: Image.asset(
-                  'assets/icons/elian.png',
-                  width: 18,
-                  height: 18,
-                ),
 
-          ),
-          const SizedBox(width: 12),
-          Text(
-            'Elian Al‑Kadar',
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-          ),
-          const Spacer(),
-          ...items.map((e) {
-            final active = _isActive(location, e.route);
-            return _NavButton(
-              label: e.label,
-              active: active,
-              onTap: () => context.go(e.route),
-            );
-          }),
-          const SizedBox(width: 6),
-        ],
+            const Spacer(),
+
+            ...items.map((e) {
+              final active = _isActive(location, e.route);
+              return _NavButton(
+                label: e.label,
+                active: active,
+                onTap: () => context.go(e.route),
+              );
+            }),
+
+            const SizedBox(width: 6),
+          ],
+        ),
       ),
     );
   }
@@ -78,7 +82,12 @@ class _NavButton extends StatefulWidget {
   final String label;
   final bool active;
   final VoidCallback onTap;
-  const _NavButton({required this.label, required this.active, required this.onTap});
+
+  const _NavButton({
+    required this.label,
+    required this.active,
+    required this.onTap,
+  });
 
   @override
   State<_NavButton> createState() => _NavButtonState();
@@ -90,9 +99,12 @@ class _NavButtonState extends State<_NavButton> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final fg = widget.active
         ? theme.colorScheme.onSurface
-        : theme.colorScheme.onSurface.withOpacity(_hover ? 0.84 : 0.66);
+        : theme.colorScheme.onSurface.withOpacity(
+            _hover ? 0.84 : 0.66,
+          );
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
@@ -105,12 +117,17 @@ class _NavButtonState extends State<_NavButton> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 160),
             curve: Curves.easeOut,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
               color: widget.active
                   ? theme.colorScheme.onSurface.withOpacity(0.06)
-                  : (_hover ? theme.colorScheme.onSurface.withOpacity(0.04) : Colors.transparent),
+                  : (_hover
+                      ? theme.colorScheme.onSurface.withOpacity(0.04)
+                      : Colors.transparent),
               border: Border.all(
                 color: widget.active
                     ? theme.colorScheme.primary.withOpacity(0.32)
@@ -121,7 +138,8 @@ class _NavButtonState extends State<_NavButton> {
               widget.label,
               style: theme.textTheme.labelLarge?.copyWith(
                 color: fg,
-                fontWeight: widget.active ? FontWeight.w700 : FontWeight.w600,
+                fontWeight:
+                    widget.active ? FontWeight.w700 : FontWeight.w600,
               ),
             ),
           ),

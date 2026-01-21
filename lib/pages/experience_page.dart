@@ -42,10 +42,10 @@ class ExperiencePage extends StatelessWidget {
                 style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
               ),
               const SizedBox(height: 10),
-              Wrap(
+              const Wrap(
                 spacing: 10,
                 runSpacing: 10,
-                children: const [
+                children: [
                   _ToolChip('Adobe Photoshop'),
                   _ToolChip('Adobe Illustrator'),
                   _ToolChip('Adobe InDesign'),

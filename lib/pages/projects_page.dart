@@ -111,7 +111,7 @@ class _Grid extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, c) {
-        final gap = 14.0;
+        const gap = 14.0;
         final totalGap = gap * (cols - 1);
         final cardW = (c.maxWidth - totalGap) / cols;
 

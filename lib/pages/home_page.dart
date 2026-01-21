@@ -21,7 +21,7 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Wrap(
+              const Wrap(
                 spacing: 12,
                 runSpacing: 12,
                 alignment: WrapAlignment.start,
@@ -78,22 +78,22 @@ class HomePage extends StatelessWidget {
               LayoutBuilder(
                 builder: (context, c) {
                   final cols = isCompact ? 1 : 3;
-                  final gap = 14.0;
+                  const gap = 14.0;
                   final totalGap = gap * (cols - 1);
                   final cardW = (c.maxWidth - totalGap) / cols;
 
                   final cards = <Widget>[
-                    _FeatureCard(
+                    const _FeatureCard(
                       title: 'Brand Consistency',
                       desc: 'Design systems + templates that scale fast and stay clean.',
                       icon: Icons.layers_outlined,
                     ),
-                    _FeatureCard(
+                    const _FeatureCard(
                       title: 'Cinematic Motion',
                       desc: 'Motion that leads the eye and supports the message.',
                       icon: Icons.movie_filter_outlined,
                     ),
-                    _FeatureCard(
+                    const _FeatureCard(
                       title: 'Production Ready',
                       desc: 'Print specs, exports, compression, and delivery discipline.',
                       icon: Icons.verified_outlined,
