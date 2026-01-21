@@ -30,7 +30,6 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
               gradient: LinearGradient(
                 colors: [theme.colorScheme.primary, theme.colorScheme.tertiary],
               ),
