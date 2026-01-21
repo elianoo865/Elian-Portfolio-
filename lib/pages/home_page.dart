@@ -27,17 +27,9 @@ class HomePage extends StatelessWidget {
                 alignment: WrapAlignment.start,
                 children: [
                   _Pill(
-                    icon: Icons.location_on_outlined,
-                    text: 'Homs, Syria',
-                  ),
-                  _Pill(
                     icon: Icons.auto_awesome_outlined,
                     text: 'Graphic Design • Motion • Video',
-                  ),
-                  _Pill(
-                    icon: Icons.school_outlined,
-                    text: 'Computer Science (UoPeople)',
-                  ),
+                  )
                 ],
               ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.12, end: 0),
               const SizedBox(height: 22),
