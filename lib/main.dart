@@ -19,7 +19,7 @@ class PortfolioApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final seed = const Color(0xFF#008080); // teal-blue
+    final seed = const Color(0xFF008080); // teal-blue
 
     final theme = ThemeData(
       useMaterial3: true,
