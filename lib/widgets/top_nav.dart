@@ -17,6 +17,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
       const _NavItem(label: 'Experience', route: '/experience'),
       const _NavItem(label: 'Projects', route: '/projects'),
       const _NavItem(label: 'Contact', route: '/contact'),
+      const _NavItem(label: 'Admin', route: '/admin'),
     ];
 
     return AppBar(
