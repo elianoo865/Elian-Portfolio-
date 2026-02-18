@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../data/experience_data.dart';
+import '../models/experience.dart';
+import '../state/portfolio_state.dart';
 import '../widgets/hover_card.dart';
 import '../widgets/responsive_container.dart';
 import '../widgets/section_header.dart';
@@ -12,6 +13,7 @@ class ExperiencePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final items = PortfolioStateScope.of(context).experienceItems;
 
     return SingleChildScrollView(
       child: Padding(
@@ -28,10 +30,10 @@ class ExperiencePage extends StatelessWidget {
 
               Column(
                 children: [
-                  for (int i = 0; i < experiences.length; i++)
+                  for (int i = 0; i < items.length; i++)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 14),
-                      child: _ExperienceCard(index: i),
+                      child: _ExperienceCard(item: items[i], index: i),
                     ),
                 ],
               ).animate().fadeIn(duration: 520.ms).slideY(begin: 0.08, end: 0),
@@ -64,13 +66,14 @@ class ExperiencePage extends StatelessWidget {
 }
 
 class _ExperienceCard extends StatelessWidget {
+  final Experience item;
   final int index;
-  const _ExperienceCard({required this.index});
+  const _ExperienceCard({required this.item, required this.index});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final e = experiences[index];
+    final e = item;
 
     return HoverCard(
       child: Padding(

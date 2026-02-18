@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../state/portfolio_state.dart';
 import '../widgets/hover_card.dart';
 import '../widgets/responsive_container.dart';
 import '../widgets/section_header.dart';
@@ -10,14 +11,11 @@ import '../widgets/section_header.dart';
 class ContactPage extends StatelessWidget {
   const ContactPage({super.key});
 
-  static const _email = 'elian445ka@gmail.com';
-  static const _phone = '+963951371814';
-  static const _linkedin = 'https://www.linkedin.com/in/eliankadar';
-  static const _behance = 'https://www.behance.net/eliankadar/';
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final state = PortfolioStateScope.of(context);
 
     return SingleChildScrollView(
       child: Padding(
@@ -58,7 +56,7 @@ class ContactPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 14),
                             FilledButton.icon(
-                              onPressed: () => _open('mailto:$_email'),
+                              onPressed: () => _open('mailto:${state.contactEmail}'),
                               icon: const Icon(Icons.send_rounded),
                               label: const Text('Email Me'),
                             ),
@@ -75,33 +73,33 @@ class ContactPage extends StatelessWidget {
                         _ContactTile(
                           icon: Icons.email_outlined,
                           title: 'Email',
-                          value: _email,
-                          onCopy: () => _copy(context, _email),
-                          onOpen: () => _open('mailto:$_email'),
+                          value: state.contactEmail,
+                          onCopy: () => _copy(context, state.contactEmail),
+                          onOpen: () => _open('mailto:${state.contactEmail}'),
                         ),
                         const SizedBox(height: 14),
                         _ContactTile(
                           icon: Icons.phone_outlined,
                           title: 'Phone',
-                          value: _phone,
-                          onCopy: () => _copy(context, _phone),
-                          onOpen: () => _open('tel:$_phone'),
+                          value: state.contactPhone,
+                          onCopy: () => _copy(context, state.contactPhone),
+                          onOpen: () => _open('tel:${state.contactPhone}'),
                         ),
                         const SizedBox(height: 14),
                         _ContactTile(
                           icon: Icons.work_outline,
                           title: 'LinkedIn',
-                          value: 'linkedin.com/in/eliankadar',
-                          onCopy: () => _copy(context, _linkedin),
-                          onOpen: () => _open(_linkedin),
+                          value: state.contactLinkedin,
+                          onCopy: () => _copy(context, state.contactLinkedin),
+                          onOpen: () => _open(state.contactLinkedin),
                         ),
                         const SizedBox(height: 14),
                         _ContactTile(
                           icon: Icons.brush_outlined,
                           title: 'Behance',
-                          value: 'behance.net/eliankadar',
-                          onCopy: () => _copy(context, _behance),
-                          onOpen: () => _open(_behance),
+                          value: state.contactBehance,
+                          onCopy: () => _copy(context, state.contactBehance),
+                          onOpen: () => _open(state.contactBehance),
                         ),
                       ],
                     ),

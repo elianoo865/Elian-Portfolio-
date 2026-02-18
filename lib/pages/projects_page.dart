@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../data/project_data.dart';
 import '../models/project.dart';
+import '../state/portfolio_state.dart';
 import '../widgets/hover_card.dart';
 import '../widgets/responsive_container.dart';
 import '../widgets/section_header.dart';
@@ -19,15 +19,16 @@ class _ProjectsPageState extends State<ProjectsPage> {
 
   List<String> get _filters {
     final set = <String>{'All'};
-    for (final p in projects) {
+    for (final p in PortfolioStateScope.of(context).projectItems) {
       set.add(p.category);
     }
     return set.toList();
   }
 
   List<Project> get _visible {
-    if (_filter == 'All') return projects;
-    return projects.where((p) => p.category == _filter).toList();
+    final items = PortfolioStateScope.of(context).projectItems;
+    if (_filter == 'All') return items;
+    return items.where((p) => p.category == _filter).toList();
   }
 
   @override
