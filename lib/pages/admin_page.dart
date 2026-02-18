@@ -184,6 +184,7 @@ class _AdminPageState extends State<AdminPage> {
                         ProjectContentBlock(type: ProjectContentType.text, title: 'Overview', body: 'Add project story here.'),
                       ],
                     ),
+                    const Project(title: 'New Project', subtitle: 'Project summary', category: 'General', tags: ['Tag']),
                   ]);
                 },
                 child: Column(
@@ -258,6 +259,14 @@ class _Field extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final int maxLines;
+  final bool requiredField;
+
+  const _Field({
+    required this.controller,
+    required this.label,
+    this.maxLines = 1,
+    this.requiredField = true,
+  });
 
   const _Field({required this.controller, required this.label, this.maxLines = 1});
 
@@ -266,6 +275,7 @@ class _Field extends StatelessWidget {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
+      validator: requiredField ? (v) => (v == null || v.trim().isEmpty) ? 'Required' : null : null,
       validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
       decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
     );
@@ -363,6 +373,10 @@ class _ProjectEditorTileState extends State<_ProjectEditorTile> {
   String _category = 'Other';
   DateTime? _publishedAt;
   late List<ProjectContentBlock> _content;
+  late final TextEditingController _title;
+  late final TextEditingController _subtitle;
+  late final TextEditingController _category;
+  late final TextEditingController _tags;
 
   @override
   void initState() {
@@ -376,6 +390,11 @@ class _ProjectEditorTileState extends State<_ProjectEditorTile> {
     _category = _categories.contains(widget.project.category) ? widget.project.category : 'Other';
     _publishedAt = widget.project.publishedAt;
     _content = List<ProjectContentBlock>.from(widget.project.content);
+    _category = projectCategories.contains(widget.project.category) ? widget.project.category : 'Other';
+    _publishedAt = widget.project.publishedAt;
+    _content = List<ProjectContentBlock>.from(widget.project.content);
+    _category = TextEditingController(text: widget.project.category);
+    _tags = TextEditingController(text: widget.project.tags.join(', '));
   }
 
   @override
@@ -459,6 +478,11 @@ class _ProjectEditorTileState extends State<_ProjectEditorTile> {
     );
   }
 
+    _category.dispose();
+    _tags.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -475,6 +499,7 @@ class _ProjectEditorTileState extends State<_ProjectEditorTile> {
             value: _category,
             decoration: const InputDecoration(labelText: 'Category', border: OutlineInputBorder()),
             items: [for (final c in _categories) DropdownMenuItem(value: c, child: Text(c))],
+            items: [for (final c in projectCategories) DropdownMenuItem(value: c, child: Text(c))],
             onChanged: (v) => setState(() => _category = v ?? 'Other'),
           ),
           const SizedBox(height: 10),
@@ -485,6 +510,11 @@ class _ProjectEditorTileState extends State<_ProjectEditorTile> {
           _Field(controller: _intro, label: 'Project intro', maxLines: 3),
           const SizedBox(height: 10),
           _Field(controller: _link, label: 'Behance URL'),
+          _Field(controller: _slug, label: 'Slug (optional)', requiredField: false),
+          const SizedBox(height: 10),
+          _Field(controller: _intro, label: 'Project intro', maxLines: 3, requiredField: false),
+          const SizedBox(height: 10),
+          _Field(controller: _link, label: 'Behance URL', requiredField: false),
           const SizedBox(height: 10),
           InkWell(
             onTap: _pickDateTime,
@@ -505,6 +535,10 @@ class _ProjectEditorTileState extends State<_ProjectEditorTile> {
             onDelete: _deleteBlock,
           ),
           const SizedBox(height: 12),
+          _Field(controller: _category, label: 'Category'),
+          const SizedBox(height: 10),
+          _Field(controller: _tags, label: 'Tags (comma separated)'),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -561,6 +595,7 @@ class _ContentBuilderPanel extends StatelessWidget {
         for (int i = 0; i < content.length; i++)
           _ContentBlockEditor(
             key: ValueKey('block-$i-${content[i].type.name}'),
+            key: ValueKey('block-$i-${content[i].type.label}'),
             index: i,
             block: content[i],
             onChanged: (b) => onUpdate(i, b),
@@ -643,6 +678,7 @@ class _ContentBlockEditorState extends State<_ContentBlockEditor> {
             Row(
               children: [
                 Text('Block ${widget.index + 1}: ${widget.block.type.name}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text('Block ${widget.index + 1}: ${widget.block.type.label}', style: const TextStyle(fontWeight: FontWeight.bold)),
                 const Spacer(),
                 IconButton(onPressed: widget.onDelete, icon: const Icon(Icons.delete_outline)),
               ],
@@ -678,6 +714,29 @@ class _ContentBlockEditorState extends State<_ContentBlockEditor> {
             ),
           ],
         ),
+      ),
+    );
+  }
+              FilledButton(
+                onPressed: () {
+                  widget.onChanged(
+                    Project(
+                      title: _title.text.trim(),
+                      subtitle: _subtitle.text.trim(),
+                      category: _category.text.trim(),
+                      tags: _tags.text
+                          .split(',')
+                          .map((tag) => tag.trim())
+                          .where((tag) => tag.isNotEmpty)
+                          .toList(),
+                    ),
+                  );
+                },
+                child: const Text('Apply'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

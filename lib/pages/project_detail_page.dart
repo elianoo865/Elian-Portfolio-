@@ -8,6 +8,11 @@ import '../widgets/responsive_container.dart';
 import '../widgets/section_header.dart';
 
 class ProjectDetailPage extends StatefulWidget {
+import '../widgets/hover_card.dart';
+import '../widgets/responsive_container.dart';
+import '../widgets/section_header.dart';
+
+class ProjectDetailPage extends StatelessWidget {
   final String slug;
   const ProjectDetailPage({super.key, required this.slug});
 
@@ -22,6 +27,9 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
   Widget build(BuildContext context) {
     final items = PortfolioStateScope.of(context).projectItems;
     final project = _findProject(items, widget.slug);
+  Widget build(BuildContext context) {
+    final items = PortfolioStateScope.of(context).projectItems;
+    final project = _findProject(items, slug);
 
     if (project == null) {
       return Center(
@@ -54,6 +62,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
             children: [
               SectionHeader(title: project.title, subtitle: project.subtitle),
               const SizedBox(height: 10),
+              const SizedBox(height: 14),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -85,6 +94,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
 
               // Behance-like stacked content flow (not card-grid).
               ...project.content.map((block) => _buildBlock(block, theme)),
+              ...project.content.map(_buildBlock),
 
               if (project.content.isEmpty) ...[
                 if (project.galleryImages.isNotEmpty)
@@ -100,6 +110,32 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
 
               if (project.link != null && project.link!.isNotEmpty) ...[
                 const SizedBox(height: 20),
+                  for (final tag in project.tags)
+                    Chip(
+                      label: Text(tag),
+                      side: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.1)),
+                    ),
+                ],
+              ),
+              if (project.detailIntro != null && project.detailIntro!.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Text(
+                  project.detailIntro!,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.82),
+                    height: 1.45,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 20),
+              if (project.galleryImages.isNotEmpty)
+                _GalleryCarousel(images: project.galleryImages),
+              if (project.videoUrl != null && project.videoUrl!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _EmbeddedVideoCard(videoUrl: project.videoUrl!),
+              ],
+              if (project.link != null && project.link!.isNotEmpty) ...[
+                const SizedBox(height: 16),
                 Align(
                   alignment: Alignment.centerRight,
                   child: FilledButton.icon(
@@ -117,6 +153,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
   }
 
   Widget _buildBlock(ProjectContentBlock block, ThemeData theme) {
+  Widget _buildBlock(ProjectContentBlock block) {
     switch (block.type) {
       case ProjectContentType.text:
         return _TextBlock(title: block.title, body: block.body);
@@ -138,6 +175,9 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
 
   static Project? _findProject(List<Project> items, String routeSlug) {
     for (final project in items) {
+      final value = project.effectiveSlug;
+  static Project? _findProject(List<Project> items, String routeSlug) {
+    for (final project in items) {
       final value = project.slug ?? _slugify(project.title);
       if (value == routeSlug) return project;
     }
@@ -152,6 +192,9 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
   static String _fmtDateTime(DateTime value) {
     String two(int n) => n.toString().padLeft(2, '0');
     return '${value.year}-${two(value.month)}-${two(value.day)} ${two(value.hour)}:${two(value.minute)}';
+  static String _slugify(String text) {
+    final sanitized = text.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-');
+    return sanitized.replaceAll(RegExp(r'^-|-$'), '');
   }
 
   static Future<void> _open(String value) async {
@@ -274,6 +317,15 @@ class _CarouselBlock extends StatefulWidget {
 }
 
 class _CarouselBlockState extends State<_CarouselBlock> {
+class _GalleryCarousel extends StatefulWidget {
+  final List<String> images;
+  const _GalleryCarousel({required this.images});
+
+  @override
+  State<_GalleryCarousel> createState() => _GalleryCarouselState();
+}
+
+class _GalleryCarouselState extends State<_GalleryCarousel> {
   late final PageController _controller;
   int _index = 0;
 
@@ -333,6 +385,78 @@ class _VideoBlock extends StatefulWidget {
 }
 
 class _VideoBlockState extends State<_VideoBlock> {
+  void _next() {
+    if (_index >= widget.images.length - 1) return;
+    _controller.nextPage(duration: const Duration(milliseconds: 280), curve: Curves.easeOut);
+  }
+
+  void _prev() {
+    if (_index <= 0) return;
+    _controller.previousPage(duration: const Duration(milliseconds: 280), curve: Curves.easeOut);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return HoverCard(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Image Carousel', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: PageView.builder(
+                  controller: _controller,
+                  itemCount: widget.images.length,
+                  onPageChanged: (value) => setState(() => _index = value),
+                  itemBuilder: (context, i) {
+                    return Image.network(
+                      widget.images[i],
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(child: Icon(Icons.broken_image_outlined, size: 38));
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                OutlinedButton.icon(onPressed: _prev, icon: const Icon(Icons.chevron_left), label: const Text('Previous')),
+                const SizedBox(width: 8),
+                OutlinedButton.icon(onPressed: _next, icon: const Icon(Icons.chevron_right), label: const Text('Next')),
+                const Spacer(),
+                Text('${_index + 1} / ${widget.images.length}'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmbeddedVideoCard extends StatefulWidget {
+  final String videoUrl;
+  const _EmbeddedVideoCard({required this.videoUrl});
+
+  @override
+  State<_EmbeddedVideoCard> createState() => _EmbeddedVideoCardState();
+}
+
+class _EmbeddedVideoCardState extends State<_EmbeddedVideoCard> {
   VideoPlayerController? _controller;
   bool _ready = false;
 
@@ -381,6 +505,73 @@ class _VideoBlockState extends State<_VideoBlock> {
             label: Text((_controller?.value.isPlaying ?? false) ? 'Pause' : 'Play'),
           ),
         ],
+    final theme = Theme.of(context);
+
+    return HoverCard(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Embedded Video', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: _ready && _controller != null
+                    ? Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          VideoPlayer(_controller!),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: VideoProgressIndicator(
+                              _controller!,
+                              allowScrubbing: true,
+                              colors: VideoProgressColors(
+                                playedColor: theme.colorScheme.primary,
+                                bufferedColor: theme.colorScheme.primary.withOpacity(0.35),
+                                backgroundColor: Colors.black26,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : const Center(child: CircularProgressIndicator()),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                FilledButton.icon(
+                  onPressed: () {
+                    if (!_ready || _controller == null) return;
+                    if (_controller!.value.isPlaying) {
+                      _controller!.pause();
+                    } else {
+                      _controller!.play();
+                    }
+                    setState(() {});
+                  },
+                  icon: Icon((_controller?.value.isPlaying ?? false) ? Icons.pause : Icons.play_arrow),
+                  label: Text((_controller?.value.isPlaying ?? false) ? 'Pause' : 'Play'),
+                ),
+                const SizedBox(width: 8),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    if (_controller == null) return;
+                    _controller!.seekTo(Duration.zero);
+                    _controller!.pause();
+                    setState(() {});
+                  },
+                  icon: const Icon(Icons.replay_rounded),
+                  label: const Text('Restart'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

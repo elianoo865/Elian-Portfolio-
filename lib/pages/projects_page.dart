@@ -141,6 +141,7 @@ class _ProjectCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return HoverCard(
+      onTap: () => context.go('/projects/${p.effectiveSlug}'),
       onTap: () => context.go('/projects/${p.slug ?? _slugify(p.title)}'),
       child: Padding(
         padding: const EdgeInsets.all(18),

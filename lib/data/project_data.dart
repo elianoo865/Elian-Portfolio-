@@ -1,7 +1,7 @@
 import '../models/project.dart';
 
 /// Replace these with real projects (Behance links, case studies, etc.)
-const projects = <Project>[
+final projects = <Project>[
   Project(
     slug: 'broadcast-motion-pack',
     title: 'Broadcast Motion Pack',

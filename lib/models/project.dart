@@ -1,3 +1,5 @@
+const projectCategories = <String>['Motion', 'Print', 'Branding', 'Social', 'UX', 'Video', 'Other'];
+
 enum ProjectContentType {
   text,
   video,
@@ -69,4 +71,31 @@ class Project {
     this.publishedAt,
     this.content = const [],
   });
+}
+
+
+extension ProjectContentTypeLabel on ProjectContentType {
+  String get label {
+    switch (this) {
+      case ProjectContentType.text:
+        return 'Text';
+      case ProjectContentType.video:
+        return 'Video';
+      case ProjectContentType.carousel:
+        return 'Carousel';
+      case ProjectContentType.imageStack:
+        return 'Image Stack';
+      case ProjectContentType.quote:
+        return 'Quote';
+    }
+  }
+}
+
+
+extension ProjectSlugX on Project {
+  String get effectiveSlug {
+    if (slug != null && slug!.trim().isNotEmpty) return slug!.trim();
+    final sanitized = title.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-');
+    return sanitized.replaceAll(RegExp(r'^-|-$'), '');
+  }
 }
