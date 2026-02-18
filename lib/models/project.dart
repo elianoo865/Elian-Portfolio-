@@ -1,3 +1,5 @@
+const projectCategories = <String>['Motion', 'Print', 'Branding', 'Social', 'UX', 'Video', 'Other'];
+
 enum ProjectContentType {
   text,
   video,
@@ -50,6 +52,12 @@ class Project {
   final List<String> galleryImages;
   final String? videoUrl;
 
+  /// Scheduling metadata editable from admin.
+  final DateTime? publishedAt;
+
+  /// Rich, ordered content sections used by the project detail page.
+  final List<ProjectContentBlock> content;
+
   const Project({
     required this.title,
     required this.subtitle,
@@ -60,6 +68,8 @@ class Project {
     this.detailIntro,
     this.galleryImages = const [],
     this.videoUrl,
+    this.publishedAt,
+    this.content = const [],
   });
 }
 
@@ -78,5 +88,14 @@ extension ProjectContentTypeLabel on ProjectContentType {
       case ProjectContentType.quote:
         return 'Quote';
     }
+  }
+}
+
+
+extension ProjectSlugX on Project {
+  String get effectiveSlug {
+    if (slug != null && slug!.trim().isNotEmpty) return slug!.trim();
+    final sanitized = title.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-');
+    return sanitized.replaceAll(RegExp(r'^-|-$'), '');
   }
 }
