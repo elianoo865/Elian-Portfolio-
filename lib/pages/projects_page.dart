@@ -131,12 +131,18 @@ class _ProjectCard extends StatelessWidget {
   final int index;
   const _ProjectCard({required this.p, required this.index});
 
+  static String _slugify(String text) {
+    final sanitized = text.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-');
+    return sanitized.replaceAll(RegExp(r'^-|-$'), '');
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return HoverCard(
       onTap: () => context.go('/projects/${p.effectiveSlug}'),
+      onTap: () => context.go('/projects/${p.slug ?? _slugify(p.title)}'),
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
