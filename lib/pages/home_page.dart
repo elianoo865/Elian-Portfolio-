@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
+import '../state/portfolio_state.dart';
 import '../widgets/hover_card.dart';
 import '../widgets/responsive_container.dart';
 
@@ -11,6 +12,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final state = PortfolioStateScope.of(context);
     final w = MediaQuery.sizeOf(context).width;
     final isCompact = w < 900;
 
@@ -21,21 +23,21 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Wrap(
+              Wrap(
                 spacing: 12,
                 runSpacing: 12,
                 alignment: WrapAlignment.start,
                 children: [
                   _Pill(
                     icon: Icons.auto_awesome_outlined,
-                    text: 'Graphic Design • Motion • Video',
+                    text: state.homePill,
                   )
                 ],
               ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.12, end: 0),
               const SizedBox(height: 22),
 
               Text(
-                'Design that feels cinematic\n— and works like a system.',
+                state.homeHeadline,
                 style: theme.textTheme.displaySmall?.copyWith(
                   fontWeight: FontWeight.w900,
                   letterSpacing: -1.2,
@@ -46,7 +48,7 @@ class HomePage extends StatelessWidget {
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 720),
                 child: Text(
-                  'I build clean, high-impact visuals for broadcast, print, and social media — with strong typography, clear hierarchy, and motion that supports the story.',
+                  state.homeDescription,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.72),
                     height: 1.5,
@@ -114,8 +116,8 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 34),
 
               _Callout(
-                title: 'Want a quick portfolio view?',
-                desc: 'Open Projects to see curated work buckets. You can replace placeholders with your Behance case studies anytime.',
+                title: state.homeCalloutTitle,
+                desc: state.homeCalloutDescription,
                 primaryLabel: 'Go to Projects',
                 onPrimary: () => context.go('/projects'),
               ).animate().fadeIn(duration: 650.ms, delay: 520.ms).slideY(begin: 0.12, end: 0),
