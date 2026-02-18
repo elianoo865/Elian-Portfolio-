@@ -9,6 +9,7 @@ class BottomNav extends StatelessWidget {
     if (location.startsWith('/experience')) return 1;
     if (location.startsWith('/projects')) return 2;
     if (location.startsWith('/contact')) return 3;
+    if (location.startsWith('/admin')) return 4;
     return 0;
   }
 
@@ -30,6 +31,9 @@ class BottomNav extends StatelessWidget {
           case 3:
             context.go('/contact');
             break;
+          case 4:
+            context.go('/admin');
+            break;
         }
       },
       destinations: const [
@@ -37,6 +41,7 @@ class BottomNav extends StatelessWidget {
         NavigationDestination(icon: Icon(Icons.work_outline), selectedIcon: Icon(Icons.work), label: 'Experience'),
         NavigationDestination(icon: Icon(Icons.grid_view_outlined), selectedIcon: Icon(Icons.grid_view), label: 'Projects'),
         NavigationDestination(icon: Icon(Icons.mail_outline), selectedIcon: Icon(Icons.mail), label: 'Contact'),
+        NavigationDestination(icon: Icon(Icons.admin_panel_settings_outlined), selectedIcon: Icon(Icons.admin_panel_settings), label: 'Admin'),
       ],
     );
   }
