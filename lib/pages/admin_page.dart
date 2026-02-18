@@ -174,16 +174,7 @@ class _AdminPageState extends State<AdminPage> {
                 onAdd: () {
                   state.updateProjects([
                     ...state.projectItems,
-                    Project(
-                      title: 'New Project',
-                      subtitle: 'Project summary',
-                      category: 'Motion',
-                      tags: const ['Tag'],
-                      publishedAt: DateTime.now(),
-                      content: const [
-                        ProjectContentBlock(type: ProjectContentType.text, title: 'Overview', body: 'Add project story here.'),
-                      ],
-                    ),
+                    const Project(title: 'New Project', subtitle: 'Project summary', category: 'General', tags: ['Tag']),
                   ]);
                 },
                 child: Column(
@@ -258,21 +249,15 @@ class _Field extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final int maxLines;
-  final bool requiredField;
 
-  const _Field({
-    required this.controller,
-    required this.label,
-    this.maxLines = 1,
-    this.requiredField = true,
-  });
+  const _Field({required this.controller, required this.label, this.maxLines = 1});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
-      validator: requiredField ? (v) => (v == null || v.trim().isEmpty) ? 'Required' : null : null,
+      validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
       decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
     );
   }
@@ -357,112 +342,27 @@ class _ProjectEditorTile extends StatefulWidget {
 }
 
 class _ProjectEditorTileState extends State<_ProjectEditorTile> {
-  static const _categories = ['Motion', 'Print', 'Branding', 'Social', 'UX', 'Video', 'Other'];
-
   late final TextEditingController _title;
   late final TextEditingController _subtitle;
+  late final TextEditingController _category;
   late final TextEditingController _tags;
-  late final TextEditingController _slug;
-  late final TextEditingController _intro;
-  late final TextEditingController _link;
-
-  String _category = 'Other';
-  DateTime? _publishedAt;
-  late List<ProjectContentBlock> _content;
 
   @override
   void initState() {
     super.initState();
     _title = TextEditingController(text: widget.project.title);
     _subtitle = TextEditingController(text: widget.project.subtitle);
+    _category = TextEditingController(text: widget.project.category);
     _tags = TextEditingController(text: widget.project.tags.join(', '));
-    _slug = TextEditingController(text: widget.project.slug ?? '');
-    _intro = TextEditingController(text: widget.project.detailIntro ?? '');
-    _link = TextEditingController(text: widget.project.link ?? '');
-    _category = _categories.contains(widget.project.category) ? widget.project.category : 'Other';
-    _publishedAt = widget.project.publishedAt;
-    _content = List<ProjectContentBlock>.from(widget.project.content);
   }
 
   @override
   void dispose() {
     _title.dispose();
     _subtitle.dispose();
+    _category.dispose();
     _tags.dispose();
-    _slug.dispose();
-    _intro.dispose();
-    _link.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickDateTime() async {
-    final now = DateTime.now();
-    final base = _publishedAt ?? now;
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: base,
-      firstDate: DateTime(2010),
-      lastDate: DateTime(2100),
-    );
-    if (pickedDate == null) return;
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(base),
-    );
-    if (pickedTime == null) return;
-    setState(() {
-      _publishedAt = DateTime(
-        pickedDate.year,
-        pickedDate.month,
-        pickedDate.day,
-        pickedTime.hour,
-        pickedTime.minute,
-      );
-    });
-  }
-
-  void _addBlock(ProjectContentType type) {
-    setState(() {
-      _content = [
-        ..._content,
-        ProjectContentBlock(
-          type: type,
-          title: type == ProjectContentType.text ? 'Section title' : '',
-          body: type == ProjectContentType.text ? 'Write your content here.' : '',
-          baseMargin: 12,
-        ),
-      ];
-    });
-  }
-
-  void _updateBlock(int index, ProjectContentBlock block) {
-    setState(() => _content = [..._content]..[index] = block);
-  }
-
-  void _deleteBlock(int index) {
-    setState(() => _content = [..._content]..removeAt(index));
-  }
-
-  void _save() {
-    widget.onChanged(
-      Project(
-        title: _title.text.trim(),
-        subtitle: _subtitle.text.trim(),
-        category: _category,
-        tags: _tags.text
-            .split(',')
-            .map((tag) => tag.trim())
-            .where((tag) => tag.isNotEmpty)
-            .toList(),
-        slug: _slug.text.trim().isEmpty ? null : _slug.text.trim(),
-        detailIntro: _intro.text.trim().isEmpty ? null : _intro.text.trim(),
-        link: _link.text.trim().isEmpty ? null : _link.text.trim(),
-        publishedAt: _publishedAt,
-        content: _content,
-        galleryImages: widget.project.galleryImages,
-        videoUrl: widget.project.videoUrl,
-      ),
-    );
   }
 
   @override
@@ -477,213 +377,35 @@ class _ProjectEditorTileState extends State<_ProjectEditorTile> {
           const SizedBox(height: 10),
           _Field(controller: _subtitle, label: 'Subtitle', maxLines: 2),
           const SizedBox(height: 10),
-          DropdownButtonFormField<String>(
-            value: _category,
-            decoration: const InputDecoration(labelText: 'Category', border: OutlineInputBorder()),
-            items: [for (final c in _categories) DropdownMenuItem(value: c, child: Text(c))],
-            onChanged: (v) => setState(() => _category = v ?? 'Other'),
-          ),
+          _Field(controller: _category, label: 'Category'),
           const SizedBox(height: 10),
           _Field(controller: _tags, label: 'Tags (comma separated)'),
           const SizedBox(height: 10),
-          _Field(controller: _slug, label: 'Slug (optional)', requiredField: false),
-          const SizedBox(height: 10),
-          _Field(controller: _intro, label: 'Project intro', maxLines: 3, requiredField: false),
-          const SizedBox(height: 10),
-          _Field(controller: _link, label: 'Behance URL', requiredField: false),
-          const SizedBox(height: 10),
-          InkWell(
-            onTap: _pickDateTime,
-            child: InputDecorator(
-              decoration: const InputDecoration(
-                labelText: 'Published date & time',
-                border: OutlineInputBorder(),
-                suffixIcon: Icon(Icons.calendar_month_outlined),
-              ),
-              child: Text(_publishedAt == null ? 'Click to set date & time' : _fmtDateTime(_publishedAt!)),
-            ),
-          ),
-          const SizedBox(height: 14),
-          _ContentBuilderPanel(
-            content: _content,
-            onAdd: _addBlock,
-            onUpdate: _updateBlock,
-            onDelete: _deleteBlock,
-          ),
-          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton.icon(onPressed: widget.onDelete, icon: const Icon(Icons.delete_outline), label: const Text('Delete')),
               const SizedBox(width: 8),
-              FilledButton(onPressed: _save, child: const Text('Apply')),
+              FilledButton(
+                onPressed: () {
+                  widget.onChanged(
+                    Project(
+                      title: _title.text.trim(),
+                      subtitle: _subtitle.text.trim(),
+                      category: _category.text.trim(),
+                      tags: _tags.text
+                          .split(',')
+                          .map((tag) => tag.trim())
+                          .where((tag) => tag.isNotEmpty)
+                          .toList(),
+                    ),
+                  );
+                },
+                child: const Text('Apply'),
+              ),
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  static String _fmtDateTime(DateTime value) {
-    String two(int n) => n.toString().padLeft(2, '0');
-    return '${value.year}-${two(value.month)}-${two(value.day)} ${two(value.hour)}:${two(value.minute)}';
-  }
-}
-
-class _ContentBuilderPanel extends StatelessWidget {
-  final List<ProjectContentBlock> content;
-  final ValueChanged<ProjectContentType> onAdd;
-  final void Function(int index, ProjectContentBlock block) onUpdate;
-  final ValueChanged<int> onDelete;
-
-  const _ContentBuilderPanel({
-    required this.content,
-    required this.onAdd,
-    required this.onUpdate,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Content Blocks', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            OutlinedButton.icon(onPressed: () => onAdd(ProjectContentType.text), icon: const Icon(Icons.text_fields), label: const Text('Text Block')),
-            OutlinedButton.icon(onPressed: () => onAdd(ProjectContentType.video), icon: const Icon(Icons.video_library_outlined), label: const Text('Video Block')),
-            OutlinedButton.icon(onPressed: () => onAdd(ProjectContentType.carousel), icon: const Icon(Icons.view_carousel_outlined), label: const Text('Carousel Block')),
-            OutlinedButton.icon(onPressed: () => onAdd(ProjectContentType.imageStack), icon: const Icon(Icons.layers_outlined), label: const Text('Image Stack')),
-            OutlinedButton.icon(onPressed: () => onAdd(ProjectContentType.quote), icon: const Icon(Icons.format_quote_outlined), label: const Text('Quote Block')),
-          ],
-        ),
-        const SizedBox(height: 10),
-        if (content.isEmpty)
-          const Text('No content blocks yet. Add blocks above to build a Behance-like project flow.'),
-        for (int i = 0; i < content.length; i++)
-          _ContentBlockEditor(
-            key: ValueKey('block-$i-${content[i].type.label}'),
-            index: i,
-            block: content[i],
-            onChanged: (b) => onUpdate(i, b),
-            onDelete: () => onDelete(i),
-          ),
-      ],
-    );
-  }
-}
-
-class _ContentBlockEditor extends StatefulWidget {
-  final int index;
-  final ProjectContentBlock block;
-  final ValueChanged<ProjectContentBlock> onChanged;
-  final VoidCallback onDelete;
-
-  const _ContentBlockEditor({
-    super.key,
-    required this.index,
-    required this.block,
-    required this.onChanged,
-    required this.onDelete,
-  });
-
-  @override
-  State<_ContentBlockEditor> createState() => _ContentBlockEditorState();
-}
-
-class _ContentBlockEditorState extends State<_ContentBlockEditor> {
-  late final TextEditingController _title;
-  late final TextEditingController _body;
-  late final TextEditingController _url;
-  late final TextEditingController _images;
-  late bool _overlap;
-  late double _margin;
-
-  @override
-  void initState() {
-    super.initState();
-    _title = TextEditingController(text: widget.block.title);
-    _body = TextEditingController(text: widget.block.body);
-    _url = TextEditingController(text: widget.block.url ?? '');
-    _images = TextEditingController(text: widget.block.images.join('\n'));
-    _overlap = widget.block.overlapImages;
-    _margin = widget.block.baseMargin;
-  }
-
-  @override
-  void dispose() {
-    _title.dispose();
-    _body.dispose();
-    _url.dispose();
-    _images.dispose();
-    super.dispose();
-  }
-
-  void _emit() {
-    widget.onChanged(
-      ProjectContentBlock(
-        type: widget.block.type,
-        title: _title.text.trim(),
-        body: _body.text.trim(),
-        url: _url.text.trim().isEmpty ? null : _url.text.trim(),
-        images: _images.text.split('\n').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
-        overlapImages: _overlap,
-        baseMargin: _margin,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text('Block ${widget.index + 1}: ${widget.block.type.label}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                const Spacer(),
-                IconButton(onPressed: widget.onDelete, icon: const Icon(Icons.delete_outline)),
-              ],
-            ),
-            if (widget.block.type == ProjectContentType.text || widget.block.type == ProjectContentType.quote) ...[
-              _Field(controller: _title, label: 'Title/Author'),
-              const SizedBox(height: 8),
-              _Field(controller: _body, label: 'Text', maxLines: 3),
-            ],
-            if (widget.block.type == ProjectContentType.video) ...[
-              _Field(controller: _title, label: 'Section title'),
-              const SizedBox(height: 8),
-              _Field(controller: _url, label: 'Video URL'),
-            ],
-            if (widget.block.type == ProjectContentType.carousel || widget.block.type == ProjectContentType.imageStack) ...[
-              _Field(controller: _images, label: 'Image URLs (one per line)', maxLines: 4),
-              const SizedBox(height: 8),
-              if (widget.block.type == ProjectContentType.imageStack) ...[
-                SwitchListTile(
-                  value: _overlap,
-                  title: const Text('Overlap images (Behance style)'),
-                  contentPadding: EdgeInsets.zero,
-                  onChanged: (v) => setState(() => _overlap = v),
-                ),
-                Text('Base margin: ${_margin.toStringAsFixed(0)}'),
-                Slider(min: 0, max: 40, value: _margin, onChanged: (v) => setState(() => _margin = v)),
-              ],
-            ],
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton(onPressed: _emit, child: const Text('Update Block')),
-            ),
-          ],
-        ),
       ),
     );
   }

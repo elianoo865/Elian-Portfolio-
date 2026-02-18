@@ -50,12 +50,6 @@ class Project {
   final List<String> galleryImages;
   final String? videoUrl;
 
-  /// Scheduling metadata editable from admin.
-  final DateTime? publishedAt;
-
-  /// Rich, ordered content sections used by the project detail page.
-  final List<ProjectContentBlock> content;
-
   const Project({
     required this.title,
     required this.subtitle,
@@ -66,8 +60,6 @@ class Project {
     this.detailIntro,
     this.galleryImages = const [],
     this.videoUrl,
-    this.publishedAt,
-    this.content = const [],
   });
 }
 
