@@ -184,6 +184,7 @@ class _AdminPageState extends State<AdminPage> {
                         ProjectContentBlock(type: ProjectContentType.text, title: 'Overview', body: 'Add project story here.'),
                       ],
                     ),
+                    const Project(title: 'New Project', subtitle: 'Project summary', category: 'General', tags: ['Tag']),
                   ]);
                 },
                 child: Column(
@@ -267,12 +268,15 @@ class _Field extends StatelessWidget {
     this.requiredField = true,
   });
 
+  const _Field({required this.controller, required this.label, this.maxLines = 1});
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
       validator: requiredField ? (v) => (v == null || v.trim().isEmpty) ? 'Required' : null : null,
+      validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
       decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
     );
   }
@@ -368,6 +372,10 @@ class _ProjectEditorTileState extends State<_ProjectEditorTile> {
   String _category = 'Other';
   DateTime? _publishedAt;
   late List<ProjectContentBlock> _content;
+  late final TextEditingController _title;
+  late final TextEditingController _subtitle;
+  late final TextEditingController _category;
+  late final TextEditingController _tags;
 
   @override
   void initState() {
@@ -381,6 +389,8 @@ class _ProjectEditorTileState extends State<_ProjectEditorTile> {
     _category = projectCategories.contains(widget.project.category) ? widget.project.category : 'Other';
     _publishedAt = widget.project.publishedAt;
     _content = List<ProjectContentBlock>.from(widget.project.content);
+    _category = TextEditingController(text: widget.project.category);
+    _tags = TextEditingController(text: widget.project.tags.join(', '));
   }
 
   @override
@@ -464,6 +474,11 @@ class _ProjectEditorTileState extends State<_ProjectEditorTile> {
     );
   }
 
+    _category.dispose();
+    _tags.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -504,11 +519,16 @@ class _ProjectEditorTileState extends State<_ProjectEditorTile> {
           ),
           const SizedBox(height: 14),
           _ContentBuilderPanel(
+            content: _content,
             onAdd: _addBlock,
             onUpdate: _updateBlock,
             onDelete: _deleteBlock,
           ),
           const SizedBox(height: 12),
+          _Field(controller: _category, label: 'Category'),
+          const SizedBox(height: 10),
+          _Field(controller: _tags, label: 'Tags (comma separated)'),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -682,6 +702,29 @@ class _ContentBlockEditorState extends State<_ContentBlockEditor> {
             ),
           ],
         ),
+      ),
+    );
+  }
+              FilledButton(
+                onPressed: () {
+                  widget.onChanged(
+                    Project(
+                      title: _title.text.trim(),
+                      subtitle: _subtitle.text.trim(),
+                      category: _category.text.trim(),
+                      tags: _tags.text
+                          .split(',')
+                          .map((tag) => tag.trim())
+                          .where((tag) => tag.isNotEmpty)
+                          .toList(),
+                    ),
+                  );
+                },
+                child: const Text('Apply'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
