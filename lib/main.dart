@@ -8,6 +8,7 @@ import 'pages/admin_page.dart';
 import 'pages/contact_page.dart';
 import 'pages/experience_page.dart';
 import 'pages/home_page.dart';
+import 'pages/project_detail_page.dart';
 import 'pages/projects_page.dart';
 import 'state/portfolio_state.dart';
 import 'widgets/animated_gradient_background.dart';
@@ -70,6 +71,7 @@ final _router = GoRouter(
         _page('/', const HomePage()),
         _page('/experience', const ExperiencePage()),
         _page('/projects', const ProjectsPage()),
+        GoRoute(path: '/projects/:slug', builder: (context, state) => ProjectDetailPage(slug: state.pathParameters['slug']!)),
         _page('/contact', const ContactPage()),
         _page('/admin', const AdminPage()),
       ],

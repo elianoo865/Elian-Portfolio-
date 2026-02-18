@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 
 import '../models/project.dart';
 import '../state/portfolio_state.dart';
@@ -47,7 +48,6 @@ class _ProjectsPageState extends State<ProjectsPage> {
                 subtitle: 'Curated buckets you can expand into full case studies (Behance, PDFs, or deep dives).',
               ),
               const SizedBox(height: 16),
-
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
@@ -60,9 +60,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
                     ),
                 ],
               ).animate().fadeIn(duration: 450.ms).slideY(begin: 0.08, end: 0),
-
               const SizedBox(height: 18),
-
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 260),
                 switchInCurve: Curves.easeOut,
@@ -74,20 +72,16 @@ class _ProjectsPageState extends State<ProjectsPage> {
                     child: child,
                   ),
                 ),
-                child: _Grid(
-                  key: ValueKey(_filter),
-                  items: _visible,
-                ),
+                child: _Grid(key: ValueKey(_filter), items: _visible),
               ),
-
               const SizedBox(height: 22),
               Text(
-                'Tip: Replace placeholders with real projects',
+                'Tip: Click a project to open its case-study page',
                 style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
               ),
               const SizedBox(height: 8),
               Text(
-                'Open lib/data/project_data.dart and add your Behance links. The UI auto-updates and keeps the layout consistent.',
+                'Each project can now include a Behance link, image carousel, and embedded video on its detail page.',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withOpacity(0.72),
                   height: 1.35,
@@ -137,14 +131,17 @@ class _ProjectCard extends StatelessWidget {
   final int index;
   const _ProjectCard({required this.p, required this.index});
 
+  static String _slugify(String text) {
+    final sanitized = text.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-');
+    return sanitized.replaceAll(RegExp(r'^-|-$'), '');
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return HoverCard(
-      onTap: () {
-        // Add url_launcher here if you set links.
-      },
+      onTap: () => context.go('/projects/${p.slug ?? _slugify(p.title)}'),
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
