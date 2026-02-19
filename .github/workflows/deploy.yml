@@ -28,7 +28,7 @@ jobs:
 
       - name: Check for unresolved merge markers
         run: |
-          if rg -n "^(<<<<<<<|=======|>>>>>>>)" lib web .github; then
+          if rg -n --hidden --glob '!.git' "^(<<<<<<<|=======|>>>>>>>|\|\|\|\|\|\|\|)" .; then
             echo "❌ Unresolved merge markers found."
             exit 1
           fi
