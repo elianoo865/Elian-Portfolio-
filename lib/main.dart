@@ -4,14 +4,17 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'app_shell.dart';
+import 'pages/admin_page.dart';
 import 'pages/contact_page.dart';
 import 'pages/experience_page.dart';
 import 'pages/home_page.dart';
+import 'pages/project_detail_page.dart';
 import 'pages/projects_page.dart';
+import 'state/portfolio_state.dart';
 import 'widgets/animated_gradient_background.dart';
 
 void main() {
-  runApp(const PortfolioApp());
+  runApp(PortfolioStateScope(state: PortfolioState(), child: const PortfolioApp()));
 }
 
 class PortfolioApp extends StatelessWidget {
@@ -57,6 +60,7 @@ class PortfolioApp extends StatelessWidget {
 }
 
 final _router = GoRouter(
+  urlPathStrategy: UrlPathStrategy.hash,
   routes: [
     ShellRoute(
       builder: (context, state, child) {
@@ -68,7 +72,9 @@ final _router = GoRouter(
         _page('/', const HomePage()),
         _page('/experience', const ExperiencePage()),
         _page('/projects', const ProjectsPage()),
+        GoRoute(path: '/projects/:slug', builder: (context, state) => ProjectDetailPage(slug: state.pathParameters['slug']!)),
         _page('/contact', const ContactPage()),
+        _page('/admin', const AdminPage()),
       ],
     ),
   ],
