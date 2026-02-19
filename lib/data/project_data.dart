@@ -19,12 +19,12 @@ final projects = <Project>[
     ],
     videoUrl: 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
     content: [
-      const ProjectContentBlock(
+      ProjectContentBlock(
         type: ProjectContentType.text,
         title: 'Project Context',
         body: 'We needed a motion system that could be reused by multiple editors without losing visual quality.',
       ),
-      const ProjectContentBlock(
+      ProjectContentBlock(
         type: ProjectContentType.imageStack,
         images: [
           'https://images.unsplash.com/photo-1460925895917-afdab827c52f',
@@ -33,7 +33,7 @@ final projects = <Project>[
         overlapImages: true,
         baseMargin: 0,
       ),
-      const ProjectContentBlock(
+      ProjectContentBlock(
         type: ProjectContentType.video,
         title: 'Motion Preview',
         url: 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
@@ -56,12 +56,12 @@ final projects = <Project>[
       'https://images.unsplash.com/photo-1507842217343-583bb7270b66',
     ],
     content: [
-      const ProjectContentBlock(
+      ProjectContentBlock(
         type: ProjectContentType.text,
         title: 'Editorial Goal',
         body: 'Define a readable and premium layout language that scales across 50+ pages per issue.',
       ),
-      const ProjectContentBlock(
+      ProjectContentBlock(
         type: ProjectContentType.carousel,
         images: [
           'https://images.unsplash.com/photo-1455390582262-044cdead277a',
@@ -69,7 +69,7 @@ final projects = <Project>[
           'https://images.unsplash.com/photo-1507842217343-583bb7270b66',
         ],
       ),
-      const ProjectContentBlock(
+      ProjectContentBlock(
         type: ProjectContentType.quote,
         body: 'A strong grid gives creative freedom because the system already solves consistency.',
         title: 'Design Principle',

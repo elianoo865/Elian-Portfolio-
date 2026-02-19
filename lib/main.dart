@@ -15,7 +15,6 @@ import 'state/portfolio_state.dart';
 import 'widgets/animated_gradient_background.dart';
 
 void main() {
-  setUrlStrategy(PathUrlStrategy());
   runApp(PortfolioStateScope(state: PortfolioState(), child: const PortfolioApp()));
 }
 
@@ -62,6 +61,7 @@ class PortfolioApp extends StatelessWidget {
 }
 
 final _router = GoRouter(
+  urlPathStrategy: UrlPathStrategy.hash,
   routes: [
     ShellRoute(
       builder: (context, state, child) {
