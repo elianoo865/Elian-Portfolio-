@@ -60,6 +60,7 @@ class PortfolioApp extends StatelessWidget {
 }
 
 final _router = GoRouter(
+  urlPathStrategy: UrlPathStrategy.hash,
   routes: [
     ShellRoute(
       builder: (context, state, child) {
